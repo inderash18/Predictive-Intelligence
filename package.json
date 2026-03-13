@@ -1,0 +1,14 @@
+{
+  "name": "predictx-ai-monorepo",
+  "version": "1.0.0",
+  "scripts": {
+    "dev:backend": "cd backend && npx nodemon server.js",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:ml": "cd ml-service && uvicorn main:app --reload --port 8000",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\" \"npm run dev:ml\"",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install && cd ../ml-service && pip install -r requirements.txt"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
