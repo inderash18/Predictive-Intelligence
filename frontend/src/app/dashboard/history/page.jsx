@@ -1,146 +1,146 @@
 "use client";
-import React, { useState } from 'react';
+import React from 'react';
 import { 
-  History, 
   Search, 
   Filter, 
+  Download, 
   Zap, 
   Server, 
   Cpu, 
-  Download,
-  MoreVertical,
-  ChevronRight
+  MoreHorizontal,
+  ChevronRight,
+  ChevronLeft,
+  Calendar,
+  ShieldCheck,
+  AlertTriangle,
+  History as HistoryIcon,
+  Hexagon
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
-const mockHistory = [
-  { id: 1, type: 'electricity', date: '2024-03-20 14:30', result: '524 MW', risk: 'Medium', status: 'Stable' },
-  { id: 2, type: 'server', date: '2024-03-20 12:15', result: '12% Failure', risk: 'Low', status: 'Healthy' },
-  { id: 3, type: 'pc_health', date: '2024-03-19 18:45', result: '82% Risk', risk: 'High', status: 'Critical' },
-  { id: 4, type: 'server', date: '2024-03-19 10:20', result: '45% Failure', risk: 'Medium', status: 'Warning' },
-  { id: 5, type: 'electricity', date: '2024-03-18 22:10', result: '310 MW', risk: 'Low', status: 'Optimal' },
+const predictions = [
+  { id: 1, type: 'Electricity', date: '2024-03-13 14:12 SYNC', result: '854.2 MW', risk: 'Medium', status: 'Completed' },
+  { id: 2, type: 'Server', date: '2024-03-13 12:45 SYNC', result: '12% Failure Risk', risk: 'Low', status: 'Completed' },
+  { id: 3, type: 'PC Health', date: '2024-03-13 10:20 SYNC', result: '98% Stability', risk: 'Low', status: 'Stable' },
+  { id: 4, type: 'Server', date: '2024-03-12 21:10 SYNC', result: '82% Failure Risk', risk: 'Critical', status: 'Action Taken' },
+  { id: 5, type: 'Electricity', date: '2024-03-12 18:30 SYNC', result: '920.5 MW', risk: 'High', status: 'Completed' },
+  { id: 6, type: 'PC Health', date: '2024-03-12 15:45 SYNC', result: '72% Stability', risk: 'Warning', status: 'Optimized' },
 ];
 
 const HistoryPage = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-
-  const getIcon = (type) => {
-    switch(type) {
-      case 'electricity': return <Zap className="w-5 h-5 text-yellow-500" />;
-      case 'server': return <Server className="w-5 h-5 text-blue-500" />;
-      case 'pc_health': return <Cpu className="w-5 h-5 text-purple-500" />;
-      default: return <History className="w-5 h-5" />;
-    }
-  };
-
-  const getStatusColor = (status) => {
-    switch(status) {
-      case 'Healthy':
-      case 'Optimal':
-      case 'Stable': return 'bg-green-50 text-green-700';
-      case 'Warning': return 'bg-orange-50 text-orange-700';
-      case 'Critical': return 'bg-red-50 text-red-700';
-      default: return 'bg-gray-50 text-gray-700';
-    }
-  };
-
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="space-y-12">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-10">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Prediction History</h1>
-          <p className="text-gray-500">Track and manage your historical AI analysis results.</p>
+          <div className="flex items-center space-x-3 mb-4">
+             <Hexagon className="w-5 h-5 text-white animate-spin-slow opacity-20" />
+             <span className="text-[11px] font-black text-white/20 uppercase tracking-[0.4em] leading-none">Prediction Records</span>
+          </div>
+          <h1 className="text-6xl font-black text-white tracking-tighter chrome-text leading-none uppercase">History</h1>
+          <p className="text-white/30 font-semibold text-lg mt-3 uppercase">A list of all previous predictions and results.</p>
         </div>
-        <button className="px-6 py-3 bg-white border border-gray-200 rounded-2xl font-bold text-gray-700 flex items-center hover:bg-gray-50 transition-all">
-          <Download className="w-5 h-5 mr-2" /> Export CSV
-        </button>
+        <div className="flex space-x-6">
+          <button className="px-8 py-4 bg-white/[0.03] border border-white/5 rounded-[20px] font-black text-[10px] text-white/40 uppercase tracking-widest hover:bg-white/10 transition-all flex items-center group shadow-2xl">
+            <Download className="w-5 h-5 mr-3 opacity-30 group-hover:text-orange-500 group-hover:opacity-100" /> Full Audit Export
+          </button>
+        </div>
       </div>
 
-      <div className="bg-white rounded-[2rem] border border-gray-100 shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-gray-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input 
-              type="text" 
-              placeholder="Search history..." 
-              className="w-full pl-12 pr-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-blue-500 font-medium"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          <div className="flex items-center space-x-3">
-            <button className="px-4 py-2 bg-gray-50 text-gray-600 rounded-xl font-bold flex items-center text-sm border border-transparent hover:border-gray-200 transition-all">
-              <Filter className="w-4 h-4 mr-2" /> Filter
-            </button>
-            <select className="px-4 py-2 bg-gray-50 text-gray-600 rounded-xl font-bold text-sm border border-transparent focus:ring-0">
-              <option>Newest First</option>
-              <option>Oldest First</option>
-            </select>
-          </div>
+      {/* Filter Bar */}
+      <div className="flex flex-col md:flex-row gap-8 items-center justify-between glass-card p-10 rounded-[40px] bg-white/[0.01] border border-white/5 shadow-2xl">
+        <div className="relative w-full md:w-[500px] group">
+          <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-white/10 w-6 h-6 group-hover:text-orange-500 transition-colors" />
+          <input 
+            placeholder="Initiate Search Sequence..."
+            className="w-full pl-16 pr-8 py-6 rounded-[24px] bg-white/5 border border-white/5 focus:ring-1 focus:ring-orange-500/30 outline-none text-white font-black text-sm uppercase tracking-widest placeholder:text-white/10"
+          />
         </div>
+        <div className="flex items-center space-x-6 w-full md:w-auto">
+          <button className="flex-1 md:flex-none flex items-center justify-center space-x-4 px-10 py-5 bg-white/5 rounded-[20px] font-black text-[10px] text-white/40 hover:bg-white/10 transition-all border border-white/5 uppercase tracking-[0.2em]">
+            <Filter className="w-4 h-4" /> <span>Filters</span>
+          </button>
+          <button className="flex-1 md:flex-none flex items-center justify-center space-x-4 px-10 py-5 bg-white/5 rounded-[20px] font-black text-[10px] text-white/40 hover:bg-white/10 transition-all border border-white/5 uppercase tracking-[0.2em]">
+            <Calendar className="w-4 h-4" /> <span>Sync Range</span>
+          </button>
+        </div>
+      </div>
 
+      {/* History Table */}
+      <div className="glass-card rounded-[50px] bg-white/[0.01] border border-white/5 overflow-hidden shadow-2xl">
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full text-left border-collapse min-w-[1000px]">
             <thead>
-              <tr className="bg-gray-50/50">
-                <th className="px-8 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Module</th>
-                <th className="px-8 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Date & Time</th>
-                <th className="px-8 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Prediction Result</th>
-                <th className="px-8 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Risk Level</th>
-                <th className="px-8 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Status</th>
-                <th className="px-8 py-4 text-right text-xs font-bold text-gray-400 uppercase tracking-wider">Actions</th>
+              <tr className="border-b border-white/5 bg-white/[0.02]">
+                <th className="px-12 py-8 text-[11px] font-black text-white/10 uppercase tracking-[0.4em]">Module Name</th>
+                <th className="px-12 py-8 text-[11px] font-black text-white/10 uppercase tracking-[0.4em] text-center">Date & Time</th>
+                <th className="px-12 py-8 text-[11px] font-black text-white/10 uppercase tracking-[0.4em]">Result</th>
+                <th className="px-12 py-8 text-[11px] font-black text-white/10 uppercase tracking-[0.4em] text-center">Risk</th>
+                <th className="px-12 py-8 text-[11px] font-black text-white/10 uppercase tracking-[0.4em] text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
-              {mockHistory.map((item) => (
-                <tr key={item.id} className="hover:bg-gray-50/50 transition-colors group">
-                  <td className="px-8 py-6">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center">
-                        {getIcon(item.type)}
+            <tbody className="divide-y divide-white/[0.03]">
+              {predictions.map((pred, i) => (
+                <motion.tr 
+                  key={pred.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.1 }}
+                  className="group hover:bg-white/[0.03] transition-colors cursor-pointer"
+                >
+                  <td className="px-12 py-10">
+                    <div className="flex items-center space-x-6">
+                      <div className={`p-4 rounded-2xl border border-white/5 group-hover:scale-110 transition-all duration-500 ${
+                        pred.type === 'Electricity' ? 'bg-orange-500/10 text-orange-500' :
+                        pred.type === 'Server' ? 'bg-blue-500/10 text-blue-500' : 'bg-emerald-500/10 text-emerald-500'
+                      }`}>
+                        {pred.type === 'Electricity' ? <Zap className="w-6 h-6" /> :
+                         pred.type === 'Server' ? <Server className="w-6 h-6" /> : <Cpu className="w-6 h-6" />}
                       </div>
-                      <span className="font-bold text-gray-900 capitalize">{item.type.replace('_', ' ')}</span>
+                      <div className="flex flex-col">
+                         <span className="font-black text-lg text-white group-hover:text-orange-500 transition-colors uppercase tracking-tight">{pred.type} Insight</span>
+                         <span className="text-[9px] font-black text-white/10 uppercase tracking-widest mt-1">Operational Module</span>
+                      </div>
                     </div>
                   </td>
-                  <td className="px-8 py-6">
-                    <span className="text-gray-500 font-medium">{item.date}</span>
+                  <td className="px-12 py-10 text-center text-[11px] font-black text-white/20 uppercase tracking-widest">
+                    {pred.date}
                   </td>
-                  <td className="px-8 py-6">
-                    <span className="text-gray-900 font-bold">{item.result}</span>
+                  <td className="px-12 py-10">
+                    <span className="font-mono text-xs font-black text-white/80 bg-white/5 px-6 py-2.5 rounded-xl border border-white/5 shadow-2xl group-hover:border-white/20 transition-all">
+                      {pred.result}
+                    </span>
                   </td>
-                  <td className="px-8 py-6">
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                      item.risk === 'High' ? 'bg-red-100 text-red-600' : 
-                      item.risk === 'Medium' ? 'bg-orange-100 text-orange-600' : 'bg-blue-100 text-blue-600'
+                  <td className="px-12 py-10 text-center">
+                    <span className={`px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all ${
+                      pred.risk === 'Critical' ? 'bg-red-500/10 text-red-500 border-red-500/20 group-hover:bg-red-500 group-hover:text-black' :
+                      pred.risk === 'High' ? 'bg-orange-500/10 text-orange-500 border-orange-500/20 group-hover:bg-orange-500 group-hover:text-black' :
+                      pred.risk === 'Warning' ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20 group-hover:bg-yellow-500 group-hover:text-black' : 
+                      'bg-emerald-500/10 text-emerald-500 border-emerald-500/20 group-hover:bg-emerald-500 group-hover:text-black'
                     }`}>
-                      {item.risk} Risk
+                      {pred.risk}
                     </span>
                   </td>
-                  <td className="px-8 py-6">
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${getStatusColor(item.status)}`}>
-                      {item.status}
-                    </span>
+                  <td className="px-12 py-10 text-right">
+                    <button className="p-4 text-white/10 hover:text-white hover:bg-white/10 rounded-2xl transition-all border border-transparent hover:border-white/10">
+                      <MoreHorizontal className="w-6 h-6" />
+                    </button>
                   </td>
-                  <td className="px-8 py-6 text-right">
-                    <div className="flex items-center justify-end space-x-2">
-                       <button className="p-2 text-gray-400 hover:text-blue-600 transition-colors">
-                        <ChevronRight className="w-5 h-5" />
-                      </button>
-                      <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
-                        <MoreVertical className="w-5 h-5" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
+                </motion.tr>
               ))}
             </tbody>
           </table>
         </div>
 
-        <div className="p-6 bg-gray-50/30 border-t border-gray-50 flex items-center justify-between">
-          <p className="text-sm text-gray-500 font-medium">Showing 5 of 128 predictions</p>
-          <div className="flex space-x-2">
-            <button className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-bold disabled:opacity-50" disabled>Previous</button>
-            <button className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-bold">Next</button>
+        {/* Pagination */}
+        <div className="px-12 py-10 bg-white/[0.02] border-t border-white/5 flex items-center justify-between">
+          <p className="text-[10px] font-black text-white/10 uppercase tracking-[0.3em]">Showing 6 of 1,240 inferences generated across $CORE_SYNC</p>
+          <div className="flex space-x-3">
+            <button className="p-3 bg-white/5 border border-white/5 rounded-2xl text-white/20 hover:bg-white/10 transition-all"><ChevronLeft className="w-5 h-5" /></button>
+            <button className="px-6 py-3 bg-white text-black font-black text-[10px] uppercase tracking-widest rounded-2xl shadow-2xl">1</button>
+            <button className="px-6 py-3 bg-white/5 border border-white/5 text-white/30 font-black text-[10px] uppercase tracking-widest rounded-2xl hover:bg-white/10 transition-all">2</button>
+            <button className="px-6 py-3 bg-white/5 border border-white/5 text-white/30 font-black text-[10px] uppercase tracking-widest rounded-2xl hover:bg-white/10 transition-all">3</button>
+            <button className="p-3 bg-white/5 border border-white/5 rounded-2xl text-white/20 hover:bg-white/10 transition-all"><ChevronRight className="w-5 h-5" /></button>
           </div>
         </div>
       </div>

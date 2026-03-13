@@ -1,50 +1,62 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #1a1a1a;
-  --card: #ffffff;
-  --card-foreground: #1a1a1a;
-  --primary: #2563eb;
+  /* Midnight Chrome Theme */
+  --primary: #fb923c; /* Orange accent from the image */
   --primary-foreground: #ffffff;
-  --secondary: #f3f4f6;
-  --secondary-foreground: #1f2937;
-  --muted: #f9fafb;
-  --muted-foreground: #6b7280;
-  --accent: #eff6ff;
-  --border: #e5e7eb;
-  --input: #f3f4f6;
-  --ring: #3b82f6;
-  --radius: 0.75rem;
-}
-
-[data-theme='dark'] {
-  --background: #0f172a;
-  --foreground: #f8fafc;
-  --card: #1e293b;
-  --card-foreground: #f8fafc;
-  --primary: #3b82f6;
-  --primary-foreground: #ffffff;
-  --secondary: #334155;
-  --secondary-foreground: #f8fafc;
-  --muted: #1e293b;
-  --muted-foreground: #94a3b8;
-  --accent: #1e293b;
-  --border: #334155;
-  --input: #334155;
-  --ring: #3b82f6;
+  
+  --background: #050505;
+  --foreground: #ffffff;
+  
+  --card: rgba(15, 15, 15, 0.4);
+  --card-foreground: #ffffff;
+  --card-border: rgba(255, 255, 255, 0.08);
+  
+  --secondary: #1a1a1a;
+  --secondary-foreground: #94a3b8;
+  
+  --muted: #0f172a;
+  --muted-foreground: #64748b;
+  
+  --accent: rgba(251, 146, 60, 0.1);
+  --accent-foreground: #fb923c;
+  
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  
+  --warning: #f59e0b;
+  --success: #10b981;
+  
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.05);
+  --ring: #fb923c;
+  
+  --radius: 24px;
 }
 
 @theme {
   --color-primary: var(--primary);
   --color-secondary: var(--secondary);
-  --color-accent: var(--accent);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
   --color-muted: var(--muted);
-  --color-card: var(--card);
-  --radius-xl: calc(var(--radius) + 4px);
+  --color-accent: var(--accent);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-destructive: var(--destructive);
   --radius-lg: var(--radius);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-sm: calc(var(--radius) - 4px);
+  --radius-xl: calc(var(--radius) + 8px);
+  --radius-md: calc(var(--radius) - 4px);
+  --radius-sm: calc(var(--radius) - 8px);
+  
+  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-float: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(2deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
 }
 
 * {
@@ -54,22 +66,62 @@
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: 'Inter', sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-image: 
+    radial-gradient(circle at 50% -20%, #111 0%, transparent 60%),
+    radial-gradient(circle at -10% 50%, #080808 0%, transparent 40%);
 }
 
-.glass {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+.glass-card {
+  background: var(--card);
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  border: 1px solid var(--card-border);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.82);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-[data-theme='dark'] .glass {
-  background: rgba(15, 23, 42, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+.glass-card:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 12px 48px 0 rgba(0, 0, 0, 0.9);
 }
 
-.gradient-text {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+.chrome-text {
+  background: linear-gradient(to bottom, #fff 0%, #a1a1a1 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+.mono-data {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Roboto Mono', monospace;
+}
+
+/* Custom Scrollbar for dark theme */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #050505;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #222;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #333;
+}
+
+input::placeholder {
+  color: #555;
+  font-weight: 500;
+}
+
+.glow-orange {
+  box-shadow: 0 0 20px rgba(251, 146, 60, 0.15);
 }
