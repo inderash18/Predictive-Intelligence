@@ -9,17 +9,7 @@ const DashboardLayout = ({ children }) => {
   const [isCollapsed, setIsCollapsed] = React.useState(false);
 
   return (
-    <div className="flex min-h-screen bg-[#050505] text-white overflow-x-hidden">
-      {/* Dynamic Background Image */}
-      <div className="fixed inset-0 z-0 opacity-20 pointer-events-none">
-        <img 
-          src="/liquid_chrome_abstract_bg_1773422680996.png" 
-          alt="bg" 
-          className="w-full h-full object-cover scale-110" 
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black" />
-      </div>
-
+    <div className="flex min-h-screen bg-background text-foreground overflow-x-hidden">
       <Sidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
       
       <div 

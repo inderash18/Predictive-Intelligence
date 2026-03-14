@@ -1,256 +1,336 @@
 "use client";
 import React, { useState } from 'react';
 import { 
-  Cpu, 
-  Thermometer, 
+  Laptop, 
+  ArrowRight, 
   Activity, 
-  AlertCircle, 
-  CheckCircle2,
+  Thermometer, 
+  HardDrive,
+  Cpu,
   ChevronRight,
-  Hexagon,
-  Sparkles,
-  Search,
+  Info,
   Download,
-  Fingerprint,
-  Zap,
-  Waves
+  AlertTriangle
 } from 'lucide-react';
 import { 
-  LineChart, 
-  Line, 
+  AreaChart, 
+  Area, 
   XAxis, 
   YAxis, 
   CartesianGrid, 
   Tooltip, 
   ResponsiveContainer,
-  BarChart,
-  Bar,
-  Cell,
   PieChart,
   Pie
 } from 'recharts';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const PCHealthPredictor = () => {
+const PCHealthPrediction = () => {
   const [loading, setLoading] = useState(false);
   const [prediction, setPrediction] = useState(null);
+  const [showDetails, setShowDetails] = useState(false);
+  
   const [inputs, setInputs] = useState({
-    cpu_temp: 55,
-    gpu_temp: 62,
-    ram_usage: 12,
-    disk_load: 45
+    cpu_temp: 50,
+    gpu_temp: 60,
+    ram_usage: 45,
+    disk_load: 30
   });
 
   const handlePredict = async (e) => {
     e.preventDefault();
     setLoading(true);
+    
+    // Simulate API logic
     setTimeout(() => {
-      const stability = 100 - (Math.max(0, inputs.cpu_temp - 70) * 2 + Math.max(0, inputs.gpu_temp - 80) * 1.5 + (inputs.ram_usage > 14 ? 20 : 0));
+      const risk_score = (inputs.cpu_temp * 0.4) + (inputs.gpu_temp * 0.3) + (inputs.ram_usage * 0.2) + (inputs.disk_load * 0.1);
+      const risk = inputs.cpu_temp > 95 || inputs.gpu_temp > 95 ? 99 : Math.min(99, Math.max(0, risk_score - 30));
+      
+      let status = "Stable";
+      let riskLevel = "Low";
+      if (risk > 80) { status = "Critical"; riskLevel = "High"; }
+      else if (risk > 50) { status = "Risk of Crash"; riskLevel = "Medium"; }
+
       setPrediction({
-        stabilityScore: Math.round(Math.max(0, stability)),
-        crashRisk: stability < 50 ? 'HIGH_MORTALITY' : stability < 80 ? 'STATE_UNSTABLE' : 'STABLE_NODE',
-        thermalMap: [
-          { segment: 'Core 0', temp: inputs.cpu_temp, limit: 95 },
-          { segment: 'Core 1', temp: inputs.cpu_temp + 2, limit: 95 },
-          { segment: 'VRAM', temp: inputs.gpu_temp - 5, limit: 105 },
-          { segment: 'HotSpot', temp: inputs.gpu_temp + 12, limit: 110 },
-        ],
-        history: [
-          { t: '12:00', stability: 98 },
-          { t: '12:15', stability: 96 },
-          { t: '12:30', stability: 92 },
-          { t: '12:45', stability: 94 },
-          { t: '13:00', stability: 88 },
-          { t: '13:15', stability: stability },
+        status,
+        riskLevel,
+        crashRisk: Math.round(risk),
+        trend: [
+          { time: '-30m', value: Math.max(0, risk - 20) },
+          { time: '-20m', value: Math.max(0, risk - 10) },
+          { time: '-10m', value: Math.max(0, risk - 5) },
+          { time: 'Now', value: risk },
+          { time: '+10m', value: Math.min(100, risk + 5) },
+          { time: '+20m', value: Math.min(100, risk + 15) },
+          { time: '+30m', value: Math.min(100, risk + 20) },
         ]
       });
       setLoading(false);
-    }, 1500);
+    }, 1200);
   };
 
+  const getRiskColor = (level) => {
+    switch(level) {
+      case 'High': return '#EF4444';
+      case 'Medium': return '#F59E0B';
+      default: return '#10B981';
+    }
+  };
+
+  const SliderInput = ({ label, icon: Icon, min, max, value, suffix, onChange }) => (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center px-1">
+        <label className="text-xs font-bold text-[var(--body-text)] uppercase tracking-wider flex items-center">
+           <Icon className="w-4 h-4 mr-2" /> {label}
+        </label>
+        <span className="font-bold text-lg text-[var(--primary)]">{value}{suffix}</span>
+      </div>
+      <div className="relative group px-1">
+        <input 
+          type="range" 
+          min={min} max={max} 
+          value={value}
+          onChange={onChange}
+          className="w-full h-2 rounded-full appearance-none cursor-pointer border border-[var(--border)]"
+          style={{
+            background: `linear-gradient(to right, var(--primary) ${(value - min) / (max - min) * 100}%, var(--alternate-bg) ${(value - min) / (max - min) * 100}%)`
+          }}
+        />
+        <style jsx>{`
+          input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            box-shadow: 0 0 10px rgba(37, 99, 235, 0.4);
+            cursor: pointer;
+            transition: transform 0.2s;
+          }
+          input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+          }
+        `}</style>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="space-y-12">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-10">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-[var(--border)]">
         <div>
-          <div className="flex items-center space-x-3 mb-4">
-             <Hexagon className="w-5 h-5 text-emerald-500 animate-spin-slow" />
-             <span className="text-[11px] font-black text-emerald-500 uppercase tracking-[0.4em] leading-none">Computer Health Check</span>
+          <div className="flex items-center space-x-2 mb-2">
+             <div className="w-2 h-2 rounded-full bg-[var(--primary)]" />
+             <span className="text-xs font-bold text-[var(--primary)] uppercase tracking-wider">Prediction Module</span>
           </div>
-          <h1 className="text-6xl font-black text-white tracking-tighter chrome-text leading-none">System Stability</h1>
-          <p className="text-white/30 font-semibold text-lg mt-3">Check if your computer is healthy or if it might crash soon.</p>
+          <h1 className="text-4xl font-bold text-[var(--foreground)] tracking-tight">Computer Health Check</h1>
+          <p className="text-[var(--body-text)] font-medium mt-2">Evaluate thermal dynamics and physical strain to predict hardware failure.</p>
         </div>
-        <div className="flex space-x-6">
-          <button className="px-8 py-4 bg-white/[0.03] border border-white/5 rounded-[20px] font-black text-[10px] text-white/40 uppercase tracking-widest hover:bg-white/10 transition-all flex items-center group">
-            <Fingerprint className="w-4 h-4 mr-3 opacity-30 group-hover:text-emerald-500 group-hover:opacity-100" /> Log In
+        <div className="flex space-x-4">
+          <button className="px-5 py-2.5 bg-[var(--alternate-bg)] border border-[var(--border)] rounded-xl font-semibold text-sm text-[var(--foreground)] hover:bg-[var(--border)] transition-all flex items-center shadow-sm">
+            <Download className="w-4 h-4 mr-2" /> Export Log
           </button>
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-12 gap-10 items-start">
-        {/* Thermal Input Panel */}
+      <div className="grid lg:grid-cols-12 gap-8 items-start">
+        {/* Input Panel */}
         <motion.div 
-          initial={{ opacity: 0, x: -30 }}
+          initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="lg:col-span-4 glass-card p-14 rounded-[50px] bg-white/[0.01] border border-white/5 relative overflow-hidden group shadow-2xl"
+          className="lg:col-span-4 glass-card p-8 rounded-3xl border border-[var(--border)]"
         >
-          <div className="flex items-center space-x-5 mb-14 relative z-10">
-            <div className="p-4 bg-white/5 rounded-[22px] border border-white/5 group-hover:rotate-[360deg] transition-transform duration-1000">
-              <Thermometer className="w-8 h-8 text-emerald-500" />
+          <div className="flex items-center space-x-4 mb-8">
+            <div className="p-3 bg-gradient-primary text-white rounded-xl shadow-md">
+              <Laptop className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-3xl font-black text-white leading-none tracking-tight">System Heat</h3>
-              <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em] mt-2 block">Check Temperatures</span>
+              <h3 className="text-xl font-bold text-[var(--foreground)]">Hardware Bio-Stats</h3>
+              <p className="text-sm text-[var(--body-text)] font-medium">Device internal logic</p>
             </div>
           </div>
 
-          <form onSubmit={handlePredict} className="space-y-12 relative z-10">
-            <div className="space-y-8">
-              <div className="space-y-3">
-                 <div className="flex justify-between border-b border-white/5 pb-2">
-                    <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">CPU Temperature</label>
-                    <span className="text-white font-black text-lg">{inputs.cpu_temp}°C</span>
-                 </div>
-                 <input type="range" min="30" max="100" value={inputs.cpu_temp} onChange={(e) => setInputs({...inputs, cpu_temp: e.target.value})} className="w-full h-1 bg-white/5 rounded-full appearance-none accent-emerald-500" />
-              </div>
-              <div className="space-y-3">
-                 <div className="flex justify-between border-b border-white/5 pb-2">
-                    <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">GPU Core Temp</label>
-                    <span className="text-white font-black text-lg">{inputs.gpu_temp}°C</span>
-                 </div>
-                 <input type="range" min="30" max="100" value={inputs.gpu_temp} onChange={(e) => setInputs({...inputs, gpu_temp: e.target.value})} className="w-full h-1 bg-white/5 rounded-full appearance-none accent-emerald-500" />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em] ml-2">RAM Usage (GB)</label>
-                <input 
-                  type="number" 
-                  value={inputs.ram_usage}
-                  onChange={(e) => setInputs({...inputs, ram_usage: e.target.value})}
-                  className="w-full px-6 py-5 rounded-[24px] bg-white/5 border border-white/5 focus:ring-1 focus:ring-emerald-500/30 outline-none text-white font-black text-xl"
-                />
-              </div>
-              <div className="space-y-4">
-                <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em] ml-2">Disk Load %</label>
-                <input 
-                  type="number" 
-                  value={inputs.disk_load}
-                  onChange={(e) => setInputs({...inputs, disk_load: e.target.value})}
-                  className="w-full px-6 py-5 rounded-[24px] bg-white/5 border border-white/5 focus:ring-1 focus:ring-emerald-500/30 outline-none text-white font-black text-xl"
-                />
-              </div>
-            </div>
+          <form onSubmit={handlePredict} className="space-y-8">
+            <SliderInput 
+              label="CPU Temp" icon={Thermometer} 
+              min="20" max="110" value={inputs.cpu_temp} suffix="°C" 
+              onChange={(e) => setInputs({...inputs, cpu_temp: e.target.value})} 
+            />
+            <SliderInput 
+              label="GPU Temp" icon={Thermometer} 
+              min="20" max="110" value={inputs.gpu_temp} suffix="°C" 
+              onChange={(e) => setInputs({...inputs, gpu_temp: e.target.value})} 
+            />
+            <SliderInput 
+              label="RAM Usage" icon={Cpu} 
+              min="0" max="100" value={inputs.ram_usage} suffix="%" 
+              onChange={(e) => setInputs({...inputs, ram_usage: e.target.value})} 
+            />
+            <SliderInput 
+              label="Disk Load" icon={HardDrive} 
+              min="0" max="100" value={inputs.disk_load} suffix="%" 
+              onChange={(e) => setInputs({...inputs, disk_load: e.target.value})} 
+            />
 
             <button 
               type="submit"
               disabled={loading}
-              className={`w-full py-7 bg-white text-black rounded-[28px] font-black text-xl uppercase tracking-tighter flex items-center justify-center shadow-[0_32px_64px_-16px_rgba(255,255,255,0.2)] active:scale-95 transition-all ${loading ? 'opacity-50 cursor-wait' : 'hover:scale-[1.02] hover:bg-white/90'}`}
+              className={`w-full py-4 bg-gradient-primary text-white rounded-xl font-bold text-base shadow-md hover:shadow-lg focus:ring-4 focus:ring-[var(--primary)]/30 active:scale-[0.98] transition-all flex items-center justify-center ${loading ? 'opacity-80' : ''}`}
             >
               {loading ? (
-                <div className="flex items-center">
-                  <div className="w-5 h-5 border-4 border-black/20 border-t-black rounded-full animate-spin mr-4" />
-                  SYNCING DIE...
-                </div>
+                <>
+                  <div className="w-5 h-5 border-3 border-white/30 border-t-white rounded-full animate-spin mr-3" />
+                  ANALYZING
+                </>
               ) : (
-                <>ANALYZE INTEGRITY <ChevronRight className="ml-3 w-7 h-7" /></>
+                <>EVALUATE HEALTH <ArrowRight className="ml-2 w-5 h-5" /></>
               )}
             </button>
           </form>
         </motion.div>
 
         {/* Results Panel */}
-        <div className="lg:col-span-8 space-y-10">
+        <div className="lg:col-span-8">
           <AnimatePresence mode="wait">
             {prediction ? (
               <motion.div 
                 key="results"
-                initial={{ opacity: 0, scale: 0.95 }}
+                initial={{ opacity: 0, scale: 0.98 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="space-y-10"
+                className="space-y-6"
               >
-                <div className="grid md:grid-cols-2 gap-10">
-                   <div className="glass-card p-14 rounded-[60px] bg-white/[0.01] border border-white/5 shadow-2xl relative overflow-hidden flex flex-col items-center justify-center">
-                      <div className="relative w-64 h-64 scale-125 mb-8">
-                         <ResponsiveContainer width="100%" height="100%">
-                            <PieChart>
-                               <Pie
-                                  data={[
-                                    { name: 'Stability', value: prediction.stabilityScore, fill: prediction.stabilityScore < 50 ? '#ef4444' : prediction.stabilityScore < 80 ? '#fb923c' : '#10b981' },
-                                    { name: 'Loss', value: 100 - prediction.stabilityScore, fill: 'rgba(255,255,255,0.03)' },
-                                  ]}
-                                  innerRadius={70}
-                                  outerRadius={90}
-                                  stroke="none"
-                                  startAngle={90}
-                                  endAngle={450}
-                                  dataKey="value"
-                               />
-                            </PieChart>
-                         </ResponsiveContainer>
-                         <div className="absolute inset-0 flex flex-col items-center justify-center">
-                            <span className="text-6xl font-black text-white tracking-tighter">{prediction.stabilityScore}%</span>
-                            <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em] mt-1 text-center leading-none">Integrity <br /> Quotient</span>
-                         </div>
+                {/* Stats Grid */}
+                <div className="grid md:grid-cols-3 gap-6">
+                  {/* Gauge style stat */}
+                  <div className="glass-card p-6 rounded-3xl border border-[var(--border)] flex items-center justify-center relative">
+                    <div className="w-32 h-32 relative">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={[
+                              { value: prediction.crashRisk, fill: getRiskColor(prediction.riskLevel) },
+                              { value: 100 - prediction.crashRisk, fill: 'var(--border)' }
+                            ]}
+                            cx="50%" cy="50%"
+                            innerRadius={45}
+                            outerRadius={55}
+                            startAngle={90}
+                            endAngle={-270}
+                            dataKey="value"
+                            stroke="none"
+                          />
+                        </PieChart>
+                      </ResponsiveContainer>
+                      <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <span className="text-xl font-bold text-[var(--foreground)] leading-none">{prediction.crashRisk}%</span>
+                        <span className="text-[10px] font-bold text-[var(--body-text)] uppercase mt-1">Crash Risk</span>
                       </div>
-                      <div className={`px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border ${
-                        prediction.stabilityScore < 50 ? 'bg-red-500/10 text-red-500 border-red-500/20' : 
-                        prediction.stabilityScore < 80 ? 'bg-orange-500/10 text-orange-500 border-orange-500/20' : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
-                      }`}>
-                        {prediction.crashRisk}
-                      </div>
-                   </div>
-
-                   <div className="glass-card p-12 rounded-[50px] bg-white/[0.01] border border-white/5 flex flex-col relative overflow-hidden">
-                      <div className="flex justify-between items-center mb-10">
-                         <h3 className="text-2xl font-black text-white tracking-tighter uppercase">Inference Matrix</h3>
-                         <Activity className="w-6 h-6 text-emerald-500/40" />
-                      </div>
-                      <div className="h-[200px] w-full">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <LineChart data={prediction.history}>
-                            <Line 
-                              type="monotone" 
-                              dataKey="stability" 
-                              stroke="#10b981" 
-                              strokeWidth={4} 
-                              dot={false}
-                              animationDuration={2500}
-                            />
-                            <Tooltip contentStyle={{background: '#000', border: 'none', borderRadius: '16px'}} />
-                          </LineChart>
-                        </ResponsiveContainer>
-                      </div>
-                      <div className="mt-8 p-6 bg-white/[0.03] rounded-3xl border border-white/5">
-                         <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em] mb-2">Stability Summary</p>
-                         <p className="text-sm font-bold text-white/60 leading-relaxed uppercase">Neural core confirms structural integrity across silicon lattice. No fatal drift detected.</p>
-                      </div>
-                   </div>
+                    </div>
+                  </div>
+                  
+                  <div className="glass-card p-6 rounded-3xl flex flex-col justify-center items-center text-center border border-[var(--border)]">
+                    <p className="text-[var(--body-text)] text-xs font-bold uppercase tracking-wider mb-3">System Stability</p>
+                    <span 
+                       className="text-2xl font-extrabold tracking-tight px-4 py-2 bg-[var(--alternate-bg)]/50 rounded-xl"
+                       style={{ color: getRiskColor(prediction.riskLevel) }}
+                    >
+                      {prediction.status}
+                    </span>
+                  </div>
+                  
+                  <div className="glass-card p-6 rounded-3xl border border-[var(--border)] flex flex-col justify-center text-center overflow-hidden relative">
+                    <p className="text-[var(--body-text)] text-xs font-bold uppercase tracking-wider mb-4 flex items-center justify-center">
+                      <AlertTriangle className="w-4 h-4 mr-2" /> Severity
+                    </p>
+                    <div className={`mx-auto px-6 py-2 rounded-full text-base font-bold bg-[var(--background)] shadow-sm`} style={{ color: getRiskColor(prediction.riskLevel) }}>
+                      {prediction.riskLevel}
+                    </div>
+                  </div>
                 </div>
 
-                <div className="glass-card p-16 rounded-[60px] bg-white/[0.01] border border-white/5 shadow-2xl relative overflow-hidden">
-                   <div className="flex items-center space-x-8 mb-16 relative z-10">
-                      <div className="p-5 bg-emerald-500 rounded-[28px] shadow-[0_20px_40px_rgba(16,185,129,0.3)]">
-                         <Zap className="w-8 h-8 text-black" />
-                      </div>
-                      <div>
-                         <h4 className="text-3xl font-black text-white tracking-tighter leading-none mb-3">Hardware Cooling Directive</h4>
-                         <p className="text-white/30 font-bold text-lg leading-relaxed uppercase">Optimal thermal distribution compiled via bi-neural simulation.</p>
-                      </div>
-                   </div>
+                <div className="glass-card p-8 rounded-3xl border border-[var(--border)]">
+                  <div className="flex justify-between items-center mb-8 relative z-10">
+                    <h3 className="text-xl font-bold text-[var(--foreground)]">Temporal Decay Matrix</h3>
+                    <div className="text-xs font-medium text-[var(--body-text)] px-3 py-1 bg-[var(--alternate-bg)] border border-[var(--border)] rounded-full">
+                       Crash Threshold Proximity
+                    </div>
+                  </div>
 
-                   <div className="grid md:grid-cols-4 gap-6 relative z-10">
-                      {prediction.thermalMap.map((node, i) => (
-                        <div key={i} className="p-8 rounded-[36px] bg-white/[0.02] border border-white/5 group hover:bg-white/[0.05] transition-all cursor-pointer">
-                           <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em] mb-4">{node.segment}</p>
-                           <p className={`text-4xl font-black mb-4 ${node.temp > node.limit - 10 ? 'text-red-500' : 'text-white'}`}>{node.temp}°C</p>
-                           <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
-                              <div className={`h-full ${node.temp > node.limit - 10 ? 'bg-red-500' : 'bg-emerald-500'} transition-all duration-1000`} style={{width: `${(node.temp/node.limit)*100}%`}} />
-                           </div>
-                        </div>
-                      ))}
-                   </div>
+                  <div className="h-[300px] w-full relative z-10">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={prediction.trend}>
+                        <defs>
+                          <linearGradient id="pcGradient" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor={getRiskColor(prediction.riskLevel)} stopOpacity={0.2}/>
+                            <stop offset="95%" stopColor={getRiskColor(prediction.riskLevel)} stopOpacity={0}/>
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="var(--border)" />
+                        <XAxis 
+                          dataKey="time" 
+                          axisLine={false} 
+                          tickLine={false} 
+                          tick={{fill: 'var(--body-text)', fontSize: 12, fontWeight: 600}} 
+                          dy={15}
+                        />
+                        <YAxis 
+                          axisLine={false} 
+                          tickLine={false} 
+                          tick={{fill: 'var(--body-text)', fontSize: 12, fontWeight: 600}} 
+                          domain={[0, 100]}
+                        />
+                        <Tooltip 
+                           contentStyle={{ 
+                             borderRadius: '16px', 
+                             border: '1px solid var(--border)', 
+                             background: 'var(--card)',
+                             color: 'var(--foreground)',
+                             fontWeight: 600,
+                             boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)'
+                           }}
+                           cursor={{ stroke: getRiskColor(prediction.riskLevel), strokeWidth: 1, strokeDasharray: '4 4' }}
+                        />
+                        <Area 
+                          type="monotone" 
+                          dataKey="value" 
+                          stroke={getRiskColor(prediction.riskLevel)} 
+                          strokeWidth={3} 
+                          fillOpacity={1} 
+                          fill="url(#pcGradient)" 
+                          animationDuration={1500}
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                  
+                  <div className="mt-8 border-t border-[var(--border)] pt-4">
+                    <button 
+                      onClick={() => setShowDetails(!showDetails)}
+                      className="text-sm font-semibold text-[var(--primary)] flex items-center hover:opacity-80 transition-opacity"
+                    >
+                      {showDetails ? 'Hide Root Cause Analysis' : 'Show Remediation Suggestions'} 
+                      <ChevronRight className={`w-4 h-4 ml-1 transition-transform ${showDetails ? 'rotate-90' : ''}`} />
+                    </button>
+                    <AnimatePresence>
+                      {showDetails && (
+                        <motion.div 
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1, marginTop: 16 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="overflow-hidden bg-[var(--alternate-bg)] p-6 rounded-2xl border border-[var(--border)]"
+                        >
+                           <h4 className="font-bold text-[var(--foreground)] mb-3">Diagnostic Advice</h4>
+                           <ul className="text-[var(--body-text)] text-sm leading-relaxed mb-4 list-disc pl-5 space-y-1">
+                             {inputs.cpu_temp > 85 && <li><strong className="text-[var(--foreground)]">Critical:</strong> Clean CPU fan or replace thermal paste to prevent logic core melting.</li>}
+                             {inputs.gpu_temp > 80 && <li><strong className="text-[var(--foreground)]">Warning:</strong> Improve chassis airflow, GPU thermal throttling imminent.</li>}
+                             {inputs.ram_usage > 90 && <li><strong className="text-[var(--foreground)]">Notice:</strong> System paging heavily. Close background apps.</li>}
+                             {prediction.riskLevel === 'Low' && <li><strong className="text-[#10B981]">Clear:</strong> System operating within safe biological constraints.</li>}
+                           </ul>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
                 </div>
               </motion.div>
             ) : (
@@ -258,17 +338,15 @@ const PCHealthPredictor = () => {
                 key="empty"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="h-full min-h-[600px] glass-card bg-white/[0.01] rounded-[60px] border-2 border-dashed border-white/5 flex flex-col items-center justify-center p-20 text-center relative overflow-hidden"
+                className="h-full min-h-[500px] glass-card bg-[var(--alternate-bg)] rounded-3xl border-2 border-dashed border-[var(--border)] flex flex-col items-center justify-center p-12 text-center"
               >
-                <div className="w-32 h-32 bg-white/5 rounded-[40px] flex items-center justify-center shadow-2xl mb-12 relative group cursor-pointer hover:bg-white/10 transition-all border border-white/5">
-                  <Activity className="w-14 h-14 text-white/10 group-hover:text-emerald-500 transition-colors" />
-                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_20px_rgba(16,185,129,0.8)]" />
+                <div className="w-24 h-24 bg-[var(--background)] rounded-full border border-[var(--border)] flex items-center justify-center shadow-sm mb-6">
+                  <Activity className="w-10 h-10 text-[var(--body-text)] opacity-50" />
                 </div>
-                <h3 className="text-4xl font-black text-white tracking-tighter mb-6 uppercase">Node Survival Offline</h3>
-                <p className="text-white/20 max-w-md font-medium text-xl leading-relaxed uppercase">
-                  Hardware telemetry sub-system dormant. Synchronize sensor seeds to view local survival quotients.
+                <h3 className="text-2xl font-bold text-[var(--foreground)] mb-3">Ready for Diagnostics</h3>
+                <p className="text-[var(--body-text)] max-w-sm font-medium">
+                  Scan and submit device telemetry (Temperature, RAM, HDD) to analyze system longevity.
                 </p>
-                <div className="absolute inset-0 bg-white/[0.01] pointer-events-none" />
               </motion.div>
             )}
           </AnimatePresence>
@@ -278,4 +356,4 @@ const PCHealthPredictor = () => {
   );
 };
 
-export default PCHealthPredictor;
+export default PCHealthPrediction;

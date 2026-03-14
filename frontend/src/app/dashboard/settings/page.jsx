@@ -1,178 +1,223 @@
 "use client";
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   User, 
   Shield, 
-  Settings as SettingsIcon, 
   Bell, 
   Eye, 
   CreditCard,
   ChevronRight,
   Fingerprint,
   Mail,
-  Zap,
   Globe,
-  Sun,
-  Moon,
-  Laptop,
-  Hexagon,
+  Smartphone,
+  CheckCircle2,
   Lock,
-  Database
+  LogOut,
+  Camera
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const SettingsPage = () => {
+  const [activeTab, setActiveTab] = useState('My Profile');
+
+  const tabs = [
+    { name: 'My Profile', icon: User },
+    { name: 'Security', icon: Shield },
+    { name: 'Notifications', icon: Bell },
+    { name: 'Appearance', icon: Eye },
+    { name: 'Billing', icon: CreditCard },
+  ];
+
   return (
-    <div className="space-y-12">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-10">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-[var(--border)]">
         <div>
-          <div className="flex items-center space-x-3 mb-4">
-             <Hexagon className="w-5 h-5 text-white/20 animate-spin-slow" />
-             <span className="text-[11px] font-black text-white/20 uppercase tracking-[0.4em] leading-none">Settings</span>
-          </div>
-          <h1 className="text-6xl font-black text-white tracking-tighter chrome-text leading-none uppercase">Account Settings</h1>
-          <p className="text-white/30 font-semibold text-lg mt-3 uppercase">Manage your profile, security, and appearance preferences.</p>
+          <h1 className="text-4xl font-bold text-[var(--foreground)] tracking-tight">Account Settings</h1>
+          <p className="text-[var(--body-text)] font-medium mt-2">Manage your profile, security preferences, and active sessions.</p>
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-12 gap-12">
+      <div className="flex flex-col lg:flex-row gap-8">
         {/* Nav Sidebar */}
-        <div className="lg:col-span-3 space-y-3">
-           {[
-             { name: 'My Profile', icon: User, active: true },
-             { name: 'Security', icon: Shield, active: false },
-             { name: 'Notifications', icon: Bell, active: false },
-             { name: 'Appearance', icon: Eye, active: false },
-             { name: 'Billing', icon: CreditCard, active: false },
-           ].map((item) => (
+        <div className="w-full lg:w-64 shrink-0 space-y-2">
+           {tabs.map((item) => (
              <button 
               key={item.name}
-              className={`w-full flex items-center space-x-5 px-8 py-5 rounded-[24px] transition-all font-black text-xs uppercase tracking-widest ${
-                item.active ? 'bg-white text-black shadow-2xl scale-105' : 'text-white/20 hover:bg-white/[0.03] hover:text-white/60'
+              onClick={() => setActiveTab(item.name)}
+              className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all font-semibold text-sm ${
+                activeTab === item.name 
+                  ? 'bg-[var(--alternate-bg)] border border-[var(--border)] text-[var(--foreground)] shadow-sm' 
+                  : 'text-[var(--body-text)] hover:bg-[var(--alternate-bg)] border border-transparent hover:text-[var(--foreground)]'
               }`}
              >
-               <item.icon className="w-5 h-5" />
+               <item.icon className={`w-4 h-4 ${activeTab === item.name ? 'text-[var(--primary)]' : ''}`} />
                <span>{item.name}</span>
              </button>
            ))}
         </div>
 
         {/* Content Area */}
-        <div className="lg:col-span-9 space-y-12">
-           {/* Profile Section */}
-           <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="glass-card p-14 rounded-[50px] bg-white/[0.01] border border-white/5 shadow-2xl relative overflow-hidden group"
-           >
-              <div className="flex items-center justify-between mb-14 relative z-10">
-                 <h3 className="text-3xl font-black text-white tracking-tighter uppercase">Identity Profile</h3>
-                 <button className="px-8 py-3 bg-orange-500 text-black rounded-[18px] font-black text-[10px] shadow-[0_20px_40px_rgba(251,146,60,0.3)] uppercase tracking-[0.2em] hover:scale-105 transition-all">Synchronize Node</button>
+        <div className="flex-1 space-y-8">
+          
+          {/* Profile Section */}
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="glass-card p-8 rounded-3xl border border-[var(--border)]"
+          >
+            <div className="flex items-center justify-between mb-8 pb-6 border-b border-[var(--border)]">
+              <div>
+                <h3 className="text-xl font-bold text-[var(--foreground)] mb-1">Public Profile</h3>
+                <p className="text-[var(--body-text)] text-sm">This information will be displayed to your team members.</p>
               </div>
+              <button className="px-5 py-2.5 bg-gradient-primary text-white rounded-xl font-semibold text-sm shadow-md hover:shadow-lg transition-all hidden sm:block">
+                Save Changes
+              </button>
+            </div>
 
-              <div className="flex flex-col md:flex-row items-start md:items-center space-y-8 md:space-y-0 md:space-x-12 mb-16 relative z-10">
-                 <div className="relative group/avatar">
-                    <div className="w-32 h-32 rounded-[40px] bg-white/[0.03] flex items-center justify-center overflow-hidden border-2 border-white/10 shadow-2xl relative z-10 p-1">
-                       <img src="https://i.pravatar.cc/150?u=4" alt="avatar" className="rounded-[36px] grayscale hover:grayscale-0 transition-all duration-700" />
-                    </div>
-                    <div className="absolute inset-0 bg-black/60 rounded-[40px] flex items-center justify-center opacity-0 group-hover/avatar:opacity-100 transition-opacity z-20 cursor-pointer backdrop-blur-sm">
-                       <span className="text-[10px] font-black text-white uppercase tracking-widest">Update</span>
-                    </div>
-                    <div className="absolute -right-3 -top-3 w-10 h-10 bg-orange-500 rounded-2xl flex items-center justify-center text-black border-4 border-[#050505] z-30 shadow-2xl">
-                       <Zap className="w-5 h-5" />
-                    </div>
-                 </div>
-                 <div className="flex-1">
-                    <p className="text-4xl font-black text-white leading-none mb-3 tracking-tighter uppercase">Marcus Vance</p>
-                    <p className="text-lg font-bold text-white/20 uppercase tracking-widest">Administrator</p>
-                    <div className="flex items-center space-x-6 mt-6">
-                       <span className="flex items-center text-[10px] font-black text-orange-500 uppercase tracking-[0.3em] bg-orange-500/10 px-4 py-1.5 rounded-full border border-orange-500/20">Verified Admin</span>
-                       <span className="text-[10px] font-black text-white/10 uppercase tracking-[0.2em] border-l border-white/10 pl-6">US-EAST-01</span>
-                    </div>
-                 </div>
+            <div className="flex flex-col md:flex-row items-start md:items-center space-y-6 md:space-y-0 md:space-x-8 mb-10">
+              <div className="relative group">
+                <div className="w-24 h-24 rounded-2xl bg-[var(--alternate-bg)] flex items-center justify-center overflow-hidden border border-[var(--border)] shadow-sm">
+                  <img src="https://ui-avatars.com/api/?name=Marcus+Vance&background=2563EB&color=fff&size=200" alt="avatar" className="w-full h-full object-cover" />
+                </div>
+                <button className="absolute inset-0 bg-black/50 backdrop-blur-sm rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Camera className="w-6 h-6 text-white" />
+                </button>
               </div>
-
-              <div className="grid md:grid-cols-2 gap-10 relative z-10">
-                 <div className="space-y-4">
-                    <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em] ml-2">Official Identity Label</label>
-                    <div className="relative group">
-                       <User className="absolute left-6 top-1/2 -translate-y-1/2 text-white/10 w-5 h-5 group-hover:text-orange-500 transition-colors" />
-                       <input className="w-full pl-16 pr-8 py-6 rounded-[24px] bg-white/5 border border-white/5 focus:ring-1 focus:ring-orange-500/30 font-black text-white text-lg uppercase transition-all" defaultValue="Marcus Vance" />
-                    </div>
+              <div className="flex-1">
+                 <div className="flex space-x-4 mb-4">
+                   <button className="px-4 py-2 border border-[var(--border)] bg-[var(--background)] hover:bg-[var(--alternate-bg)] rounded-lg font-semibold text-sm text-[var(--foreground)] transition-colors">
+                     Change Avatar
+                   </button>
+                   <button className="px-4 py-2 font-semibold text-sm text-red-500 hover:bg-red-500/10 rounded-lg transition-colors">
+                     Remove
+                   </button>
                  </div>
-                 <div className="space-y-4">
-                    <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em] ml-2">Communication Channel</label>
-                    <div className="relative group">
-                       <Mail className="absolute left-6 top-1/2 -translate-y-1/2 text-white/10 w-5 h-5 group-hover:text-orange-500 transition-colors" />
-                       <input className="w-full pl-16 pr-8 py-6 rounded-[24px] bg-white/5 border border-white/5 focus:ring-1 focus:ring-orange-500/30 font-black text-white text-lg transition-all" defaultValue="marcus@cybergrid.ai" />
-                    </div>
-                 </div>
+                 <p className="text-xs text-[var(--body-text)] font-medium">JPEG, GIF or PNG. Max size of 2MB.</p>
               </div>
-              <div className="absolute right-[-10%] bottom-[-20%] w-96 h-96 bg-white/[0.01] rounded-full blur-[120px] pointer-events-none" />
-           </motion.div>
+            </div>
 
-           {/* Security Settings */}
-           <motion.div 
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="glass-card p-14 rounded-[50px] bg-white/[0.01] border border-white/5 shadow-2xl relative overflow-hidden"
-           >
-              <h3 className="text-3xl font-black text-white tracking-tighter mb-12 uppercase">Access & Security</h3>
-              <div className="space-y-6">
-                 {[
-                   { name: 'Dual-Factor Authentication', status: 'ACTIVE_NODE', icon: Shield, active: true },
-                   { name: 'Hardware Biometrics (FIDO2)', status: 'SYNCH_REQUIRED', icon: Fingerprint, active: false },
-                   { name: 'Neural Session Timeout', status: '15 MINUTES', icon: Globe, active: true },
-                 ].map((setting) => (
-                   <div key={setting.name} className="flex items-center justify-between p-8 rounded-[32px] bg-white/[0.02] border border-white/5 group hover:bg-orange-500 hover:border-transparent transition-all cursor-pointer">
-                      <div className="flex items-center space-x-6">
-                         <div className="p-4 bg-white/5 rounded-2xl group-hover:bg-black transition-colors">
-                            <setting.icon className="w-6 h-6 text-white/20 group-hover:text-orange-500 shadow-2xl" />
-                         </div>
-                         <div>
-                            <p className="font-black text-white group-hover:text-black text-xl tracking-tight transition-colors uppercase">{setting.name}</p>
-                            <p className="text-[10px] font-black text-white/20 group-hover:text-black/40 uppercase tracking-[0.2em] mt-1 transition-colors">{setting.status}</p>
-                         </div>
-                      </div>
-                      <ChevronRight className="w-6 h-6 text-white/10 group-hover:text-black transition-colors" />
-                   </div>
-                 ))}
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-[var(--foreground)]">Full Name</label>
+                <div className="relative">
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--body-text)] w-4 h-4" />
+                  <input 
+                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-[var(--background)] border border-[var(--border)] focus:ring-2 focus:ring-[var(--primary)] outline-none font-semibold text-[var(--foreground)] text-sm transition-all shadow-inner" 
+                    defaultValue="Marcus Vance" 
+                  />
+                </div>
               </div>
-           </motion.div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-[var(--foreground)]">Email Address</label>
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--body-text)] w-4 h-4" />
+                  <input 
+                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-[var(--background)] border border-[var(--border)] focus:ring-2 focus:ring-[var(--primary)] outline-none font-semibold text-[var(--foreground)] text-sm transition-all shadow-inner" 
+                    defaultValue="marcus@predictx.ai" 
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <button className="mt-8 w-full px-5 py-3 bg-gradient-primary text-white rounded-xl font-semibold text-sm shadow-md hover:shadow-lg transition-all sm:hidden">
+              Save Changes
+            </button>
+          </motion.div>
 
-           {/* Preference Toggle */}
-           <motion.div 
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="glass-card p-14 rounded-[50px] bg-white text-black shadow-[0_40px_80px_rgba(255,255,255,0.1)] overflow-hidden relative group"
-           >
-              <div className="relative z-10 flex flex-col md:flex-row items-center justify-between">
-                 <div className="flex items-center space-x-8 mb-10 md:mb-0">
-                    <div className="p-5 bg-black rounded-[24px] shadow-2xl">
-                       <Eye className="w-8 h-8 text-orange-500" />
+          {/* Security Settings */}
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="glass-card p-8 rounded-3xl border border-[var(--border)]"
+          >
+            <div className="mb-8 pb-6 border-b border-[var(--border)]">
+              <h3 className="text-xl font-bold text-[var(--foreground)] mb-1">Security & Access</h3>
+              <p className="text-[var(--body-text)] text-sm">Protect your account with extra layers of security.</p>
+            </div>
+            
+            <div className="space-y-4">
+              {[
+                { name: 'Two-Factor Authentication (2FA)', status: 'Enabled', icon: Shield, active: true },
+                { name: 'Biometric Login (WebAuthn)', status: 'Not Configured', icon: Fingerprint, active: false },
+                { name: 'Password Update', status: 'Last changed 3 months ago', icon: Lock, active: false },
+              ].map((setting) => (
+                <div key={setting.name} className="flex flex-col sm:flex-row sm:items-center justify-between p-5 rounded-2xl bg-[var(--alternate-bg)] border border-[var(--border)] hover:border-[var(--primary)]/50 transition-colors">
+                  <div className="flex items-start sm:items-center space-x-4 mb-4 sm:mb-0">
+                    <div className={`p-3 rounded-xl flex shrink-0 ${setting.active ? 'bg-[#10B981]/10 text-[#10B981]' : 'bg-[var(--background)] text-[var(--body-text)] border border-[var(--border)]'}`}>
+                      <setting.icon className="w-5 h-5" />
                     </div>
                     <div>
-                       <h4 className="text-4xl font-black tracking-tighter uppercase leading-none">System Rendering</h4>
-                       <p className="text-[10px] font-black text-black/40 uppercase tracking-[0.3em] mt-3 leading-none">Global Interface Seed</p>
+                      <p className="font-bold text-[var(--foreground)] text-sm mb-1">{setting.name}</p>
+                      <p className="text-xs font-semibold text-[var(--body-text)] flex items-center">
+                        {setting.active && <CheckCircle2 className="w-3 h-3 text-[#10B981] mr-1" />}
+                        {setting.status}
+                      </p>
                     </div>
+                  </div>
+                  <button className="px-4 py-2 bg-[var(--background)] border border-[var(--border)] rounded-lg text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--primary)] hover:text-white hover:border-[var(--primary)] transition-all sm:w-auto w-full">
+                    {setting.active ? 'Manage' : 'Configure'}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Active Sessions */}
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="glass-card p-8 rounded-3xl border border-[var(--border)]"
+          >
+            <div className="mb-8 pb-6 border-b border-[var(--border)]">
+              <h3 className="text-xl font-bold text-[var(--foreground)] mb-1">Active Sessions</h3>
+              <p className="text-[var(--body-text)] text-sm">Review devices currently logged into your account.</p>
+            </div>
+
+            <div className="space-y-4">
+               {/* Current Session */}
+               <div className="flex items-center justify-between p-5 rounded-2xl border border-[#10B981]/30 bg-[#10B981]/5 relative overflow-hidden">
+                 <div className="flex items-center space-x-4">
+                   <div className="p-3 bg-[var(--background)] rounded-xl border border-[var(--border)] text-[var(--foreground)]">
+                     <Globe className="w-5 h-5" />
+                   </div>
+                   <div>
+                     <p className="font-bold text-[var(--foreground)] text-sm">Windows 11 • Chrome Browser</p>
+                     <p className="text-xs font-semibold text-[var(--body-text)] mt-1">192.168.1.42 • New York, US</p>
+                   </div>
                  </div>
-                 <div className="flex p-2 bg-black/5 rounded-[28px] border border-black/5">
-                    <button className="flex items-center space-x-3 px-8 py-3 hover:bg-white rounded-2xl font-black text-[10px] text-black/40 uppercase tracking-[0.2em] transition-all">
-                       <Sun className="w-4 h-4" /> <span>Light</span>
-                    </button>
-                    <button className="flex items-center space-x-3 px-8 py-3 bg-black text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] shadow-2xl transition-all scale-105">
-                       <Moon className="w-4 h-4 text-orange-500" /> <span>Midnight</span>
-                    </button>
-                    <button className="flex items-center space-x-3 px-8 py-3 hover:bg-white rounded-2xl font-black text-[10px] text-black/40 uppercase tracking-[0.2em] transition-all">
-                       <Laptop className="w-4 h-4" /> <span>Auto</span>
+                 <div className="flex flex-col items-end">
+                    <span className="text-xs font-bold text-[#10B981] mb-1">Current Session</span>
+                 </div>
+               </div>
+
+               {/* Other Session */}
+               <div className="flex items-center justify-between p-5 rounded-2xl bg-[var(--alternate-bg)] border border-[var(--border)] group">
+                 <div className="flex items-center space-x-4">
+                   <div className="p-3 bg-[var(--background)] rounded-xl border border-[var(--border)] text-[var(--body-text)]">
+                     <Smartphone className="w-5 h-5" />
+                   </div>
+                   <div>
+                     <p className="font-bold text-[var(--foreground)] text-sm">iPhone 14 Pro • Safari mobile</p>
+                     <p className="text-xs font-semibold text-[var(--body-text)] mt-1">10.0.0.12 • New York, US</p>
+                   </div>
+                 </div>
+                 <div className="flex items-center space-x-4">
+                    <span className="text-xs font-medium text-[var(--body-text)] hidden sm:block">Active 2 days ago</span>
+                    <button className="p-2 sm:px-3 sm:py-2 bg-[var(--background)] border border-[var(--border)] rounded-lg text-xs font-bold text-red-500 hover:bg-red-500 hover:text-white transition-colors flex items-center">
+                      <LogOut className="w-4 h-4 sm:mr-2" />
+                      <span className="hidden sm:inline">Revoke</span>
                     </button>
                  </div>
-              </div>
-              <div className="absolute left-[-10%] top-[-20%] w-64 h-64 bg-orange-500/10 rounded-full blur-[100px] pointer-events-none group-hover:scale-150 transition-transform duration-1000" />
-           </motion.div>
+               </div>
+            </div>
+          </motion.div>
+          
         </div>
       </div>
     </div>
